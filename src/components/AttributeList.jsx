@@ -16,6 +16,7 @@ const AttributeList = ({ characterId }) => {
             {Object.keys(character.attributes).map((attr) => (
                 <div key={attr} style={{ marginBottom: '10px' }}>
                     <span>{attr}: {character.attributes[attr]}</span>
+                    <span> (Modifier: {character.modifiers[attr]})</span>
                     <button className='buttonIncrement1' onClick={() => incrementAttribute(character.id, attr)}>+</button>
                     <button className='buttonDecrement1' onClick={() => decrementAttribute(character.id, attr)}>-</button>
                 </div>

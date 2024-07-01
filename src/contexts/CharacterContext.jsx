@@ -15,11 +15,19 @@ const CharacterProvider = ({ children }) => {
     const createNewCharacter = () => ({
         id: characters.length + 1,
         attributes: initialAttributes,
-        highlightedClass: []
+        highlightedClass: [],
+        modifiers: ATTRIBUTE_LIST.reduce((acc, attr) => {
+            acc[attr] = Math.floor((initialAttributes[attr] - 10) / 2);
+            return acc;
+        }, {}),
     });
 
     const addCharacter = () => {
         setCharacters([...characters, createNewCharacter()]);
+    };
+
+    const calculateModifier = (attributeValue) => {
+        return Math.floor((attributeValue - 10) / 2);
     };
 
     const incrementAttribute = (id, attr) => {
@@ -27,8 +35,9 @@ const CharacterProvider = ({ children }) => {
             prevCharacters.map(char => {
                 if (char.id === id) {
                     const newAttributes = { ...char.attributes, [attr]: char.attributes[attr] + 1 };
+                    const newModifiers = { ...char.modifiers, [attr]: calculateModifier(newAttributes[attr]) };
                     displayClass(id, newAttributes);
-                    return { ...char, attributes: newAttributes };
+                    return { ...char, attributes: newAttributes, modifiers: newModifiers };
                 }
                 return char;
             })
@@ -40,8 +49,9 @@ const CharacterProvider = ({ children }) => {
             prevCharacters.map(char => {
                 if (char.id === id) {
                     const newAttributes = { ...char.attributes, [attr]: char.attributes[attr] - 1 };
+                    const newModifiers = { ...char.modifiers, [attr]: calculateModifier(newAttributes[attr]) };
                     displayClass(id, newAttributes);
-                    return { ...char, attributes: newAttributes };
+                    return { ...char, attributes: newAttributes, modifiers: newModifiers };
                 }
                 return char;
             })
