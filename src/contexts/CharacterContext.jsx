@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { ATTRIBUTE_LIST, CLASS_LIST } from '../consts';
+import { ATTRIBUTE_LIST, CLASS_LIST, SKILL_LIST } from '../consts';
 
 const CharacterContext = createContext();
 
@@ -7,6 +7,14 @@ const CharacterProvider = ({ children }) => {
 
     const initialAttributes = ATTRIBUTE_LIST.reduce((acc, attr) => {
         acc[attr] = 10;
+        return acc;
+    }, {});
+
+    const initialSkills = SKILL_LIST.reduce((acc, skl) => {
+        acc[skl.name] = {
+            value: 0,
+            attributeModifier: skl.attributeModifier,
+        };
         return acc;
     }, {});
 
@@ -20,6 +28,7 @@ const CharacterProvider = ({ children }) => {
             acc[attr] = Math.floor((initialAttributes[attr] - 10) / 2);
             return acc;
         }, {}),
+        skills: initialSkills,
     });
 
     const addCharacter = () => {
@@ -83,6 +92,39 @@ const CharacterProvider = ({ children }) => {
         );
     };
 
+    const incrementSkill = (id, skill) => {
+        const characterToUpdate = characters.find(char => char.id === id);
+        let total = Object.values(characterToUpdate.skills).reduce((acc, skl) => acc + skl.value, 0);
+        const TotalSkill = 10 + (4 * characterToUpdate.modifiers['Intelligence']);
+
+        if (total >= TotalSkill) {
+            alert("You need more skill points! Upgrade intelligence to get more");
+            return
+        }
+
+        setCharacters(prevCharacters =>
+            prevCharacters.map(char => {
+                if (char.id === id) {
+
+                    const newSkills = { ...char.skills, [skill]: { ...char.skills[skill], value: char.skills[skill].value + 1 } };
+                    return { ...char, skills: newSkills };
+                }
+                return char;
+            })
+        );
+    };
+
+    const decrementSkill = (id, skill) => {
+        setCharacters(prevCharacters =>
+            prevCharacters.map(char => {
+                if (char.id === id) {
+                    const newSkills = { ...char.skills, [skill]: { ...char.skills[skill], value: char.skills[skill].value - 1 } };
+                    return { ...char, skills: newSkills };
+                }
+                return char;
+            })
+        );
+    };
     return (
         <CharacterContext.Provider
             value={{
@@ -91,6 +133,8 @@ const CharacterProvider = ({ children }) => {
                 incrementAttribute,
                 decrementAttribute,
                 displayClass,
+                incrementSkill,
+                decrementSkill,
             }}
         >
             {children}
