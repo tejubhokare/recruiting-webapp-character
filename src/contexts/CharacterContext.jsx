@@ -125,6 +125,17 @@ const CharacterProvider = ({ children }) => {
             })
         );
     };
+
+    const setCharactersFromApi = (data) => {
+        setCharacters(data.map(char => ({
+            ...char,
+            modifiers: ATTRIBUTE_LIST.reduce((acc, attr) => {
+                acc[attr] = calculateModifier(char.attributes[attr]);
+                return acc;
+            }, {}),
+        })));
+    };
+
     return (
         <CharacterContext.Provider
             value={{
@@ -135,6 +146,8 @@ const CharacterProvider = ({ children }) => {
                 displayClass,
                 incrementSkill,
                 decrementSkill,
+                setCharacters,
+                setCharactersFromApi,
             }}
         >
             {children}
