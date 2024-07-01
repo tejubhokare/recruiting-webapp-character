@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { ATTRIBUTE_LIST } from '../consts';
+import { ATTRIBUTE_LIST, CLASS_LIST } from '../consts';
 
 const CharacterContext = createContext();
 
@@ -15,6 +15,7 @@ const CharacterProvider = ({ children }) => {
     const createNewCharacter = () => ({
         id: characters.length + 1,
         attributes: initialAttributes,
+        highlightedClass: []
     });
 
     const addCharacter = () => {
@@ -26,6 +27,7 @@ const CharacterProvider = ({ children }) => {
             prevCharacters.map(char => {
                 if (char.id === id) {
                     const newAttributes = { ...char.attributes, [attr]: char.attributes[attr] + 1 };
+                    displayClass(id, newAttributes);
                     return { ...char, attributes: newAttributes };
                 }
                 return char;
@@ -38,6 +40,7 @@ const CharacterProvider = ({ children }) => {
             prevCharacters.map(char => {
                 if (char.id === id) {
                     const newAttributes = { ...char.attributes, [attr]: char.attributes[attr] - 1 };
+                    displayClass(id, newAttributes);
                     return { ...char, attributes: newAttributes };
                 }
                 return char;
@@ -45,6 +48,30 @@ const CharacterProvider = ({ children }) => {
         );
     };
 
+    const displayClass = (id, newAttributes) => {
+        setCharacters(prevCharacters =>
+            prevCharacters.map(char => {
+                if (char.id === id) {
+                    let matches = [];
+                    for (let classname in CLASS_LIST) {
+                        const classMatch = CLASS_LIST[classname];
+                        let isMatch = true;
+                        for (const attr in newAttributes) {
+                            if (newAttributes[attr] < classMatch[attr]) {
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if (isMatch) {
+                            matches.push(classname);
+                        }
+                    }
+                    return { ...char, highlightedClass: matches };
+                }
+                return char;
+            })
+        );
+    };
 
     return (
         <CharacterContext.Provider
@@ -53,6 +80,7 @@ const CharacterProvider = ({ children }) => {
                 addCharacter,
                 incrementAttribute,
                 decrementAttribute,
+                displayClass,
             }}
         >
             {children}
