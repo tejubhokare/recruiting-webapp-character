@@ -5,6 +5,7 @@ const CharacterContext = createContext();
 
 const CharacterProvider = ({ children }) => {
 
+    const maxAttributePoints = 70;
     const initialAttributes = ATTRIBUTE_LIST.reduce((acc, attr) => {
         acc[attr] = 10;
         return acc;
@@ -23,12 +24,12 @@ const CharacterProvider = ({ children }) => {
     const createNewCharacter = () => ({
         id: characters.length + 1,
         attributes: initialAttributes,
-        highlightedClass: [],
+        skills: initialSkills,
         modifiers: ATTRIBUTE_LIST.reduce((acc, attr) => {
             acc[attr] = Math.floor((initialAttributes[attr] - 10) / 2);
             return acc;
         }, {}),
-        skills: initialSkills,
+        highlightedClass: []
     });
 
     const addCharacter = () => {
@@ -40,6 +41,15 @@ const CharacterProvider = ({ children }) => {
     };
 
     const incrementAttribute = (id, attr) => {
+        const characterToUpdate = characters.find(char => char.id === id);
+        let sum = 0;
+        for (let val in characterToUpdate.attributes) {
+            sum += characterToUpdate.attributes[val];
+        }
+        if (sum >= maxAttributePoints) {
+            alert(`A character can have up to ${maxAttributePoints} delegated attribute points`);
+            return;
+        }
         setCharacters(prevCharacters =>
             prevCharacters.map(char => {
                 if (char.id === id) {
@@ -126,15 +136,6 @@ const CharacterProvider = ({ children }) => {
         );
     };
 
-    const setCharactersFromApi = (data) => {
-        setCharacters(data.map(char => ({
-            ...char,
-            modifiers: ATTRIBUTE_LIST.reduce((acc, attr) => {
-                acc[attr] = calculateModifier(char.attributes[attr]);
-                return acc;
-            }, {}),
-        })));
-    };
 
     return (
         <CharacterContext.Provider
@@ -147,7 +148,7 @@ const CharacterProvider = ({ children }) => {
                 incrementSkill,
                 decrementSkill,
                 setCharacters,
-                setCharactersFromApi,
+
             }}
         >
             {children}

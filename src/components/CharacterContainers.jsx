@@ -5,17 +5,17 @@ import { saveAllCharacter, loadCharacterData } from "../api/character";
 import { CharacterContext } from '../contexts/CharacterContext';
 
 const CharactersContainer = () => {
-    const { characters, addCharacter, setCharactersFromApi, setCharacters } = useContext(CharacterContext);
+    const { characters, addCharacter, setCharacters } = useContext(CharacterContext);
 
     useEffect(() => {
         loadCharacterData()
             .then(data => {
                 if (data.statusCode === 200) {
-                    setCharactersFromApi(data.body);
+                    setCharacters(data.body);
                 }
             })
             .catch(error => alert(`Error occurred while retrieving data from API: ${error.message}`));
-    }, []);
+    }, [setCharacters]);
 
     const resetCharacter = () => {
         setCharacters([]);

@@ -10,7 +10,7 @@ const SkillList = ({ characterId }) => {
         return null;
     }
 
-    const totalSkillPoints = 10 + (4 * character.modifiers['Intelligence']);
+    const totalSkillPoints = Math.max(0, 10 + (4 * character.modifiers['Intelligence']));
 
     return (
         <div className='mainDivSkill'>
